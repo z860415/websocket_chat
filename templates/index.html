@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off" placeholder="" />
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            document.getElementById("messageText").placeholder="輸入暱稱";
+        
+            var ws = new WebSocket("ws://localhost:8000/ws");
+            
+            // 接收
+            ws.onmessage = function(event) {
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            
+            var name = 0;
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+                if (name == 0){
+                    document.getElementById("messageText").placeholder="輸入對話內容";
+                    name = 1;
+                }
+            }
+        </script>
+    </body>
+</html>
