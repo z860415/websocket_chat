@@ -14,7 +14,7 @@
         <script>
             document.getElementById("messageText").placeholder="輸入暱稱";
         
-            var ws = new WebSocket("ws://eb101-balao-gogogo.herokuapp.com/ws");
+            var ws = new WebSocket("ws://0.0.0.0:8000/ws");
             
             // 接收
             ws.onmessage = function(event) {
