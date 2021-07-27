@@ -5,6 +5,7 @@ from starlette.routing import Route, WebSocketRoute
 from database import info
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
+import uvicorn
 
 templates = Jinja2Templates(directory='templates')
 
@@ -58,6 +59,5 @@ routes = [
 app = FastAPI(routes=routes)
 
 if __name__ == '__main__':
-    import uvicorn
     uvicorn.run(app='main:app', host="0.0.0.0",
                 port=8000, reload=True, debug=True)
