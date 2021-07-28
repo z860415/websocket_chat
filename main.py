@@ -8,18 +8,20 @@ from starlette.requests import Request
 import uvicorn
 
 templates = Jinja2Templates(directory='templates')
-username = ''
+user_name = []
 
 
 class Login(HTTPEndpoint):
-    async def get(self, request: Request, username: str = Form(...)):
-        username = username
-        return templates.TemplateResponse('login.html', {'request': request, 'username': username})
+    async def get(self, request: Request):
+        return templates.TemplateResponse('login.html', {'request': request})
 
 
 class Homepage(HTTPEndpoint):
-    async def get(self, request: Request):
-        return templates.TemplateResponse('index.html', {'request': request})
+    async def post(self, request: Request, username: str = Form(...)):
+        print(username)
+        user_name.append(username)
+        print(username, '=='*50)
+        return templates.TemplateResponse('index.html', {'request': request, 'username': username})
 
 
 class Echo(WebSocketEndpoint):
@@ -34,7 +36,7 @@ class Echo(WebSocketEndpoint):
     async def on_connect(self, websocket):
         await websocket.accept()
         socket_only = await self.alter_socket(websocket)
-        info[socket_only] = [f'{username[-1]}', websocket]
+        info[socket_only] = [f'{user_name}', websocket]
         for wbs in info:
             await info[wbs][1].send_text(f"{info[socket_only][0]}-加入了聊天室")
         print(info)
