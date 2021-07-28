@@ -1,13 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Form
 from starlette.endpoints import WebSocketEndpoint, HTTPEndpoint
 from starlette.responses import HTMLResponse
-from starlette.routing import Route, WebSocketRoute
+from starlette.routing import Route, WebSocketRoute, websocket_session
 from database import info
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
 import uvicorn
 
 templates = Jinja2Templates(directory='templates')
+username = ''
+
+
+class Login(HTTPEndpoint):
+    async def get(self, request: Request, username: str = Form(...)):
+        username = username
+        return templates.TemplateResponse('login.html', {'request': request, 'username': username})
 
 
 class Homepage(HTTPEndpoint):
@@ -26,9 +33,8 @@ class Echo(WebSocketEndpoint):
 
     async def on_connect(self, websocket):
         await websocket.accept()
-        name = await websocket.receive_text()
         socket_only = await self.alter_socket(websocket)
-        info[socket_only] = [f'{name}', websocket]
+        info[socket_only] = [f'{username[-1]}', websocket]
         for wbs in info:
             await info[wbs][1].send_text(f"{info[socket_only][0]}-加入了聊天室")
         print(info)
@@ -52,7 +58,8 @@ class Echo(WebSocketEndpoint):
 
 
 routes = [
-    Route("/", Homepage),
+    Route("/", Login),
+    Route("/chat/", Homepage),
     WebSocketRoute("/ws", Echo)
 ]
 
