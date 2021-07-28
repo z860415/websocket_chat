@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, WebSocket
 from starlette.endpoints import WebSocketEndpoint, HTTPEndpoint
-from starlette.responses import HTMLResponse
-from starlette.routing import Route, WebSocketRoute, websocket_session
+from starlette.routing import Route, WebSocketRoute
 from database import info
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
@@ -10,21 +9,21 @@ import uvicorn
 templates = Jinja2Templates(directory='templates')
 user_name = []
 
-
-class Login(HTTPEndpoint):
-    async def get(self, request: Request):
-        return templates.TemplateResponse('login.html', {'request': request})
+app = FastAPI()
 
 
-class Homepage(HTTPEndpoint):
-    async def post(self, request: Request, username: str = Form(...)):
-        print(username, '*'*50)
-        return templates.TemplateResponse('index.html', {'request': request, 'username': username})
+@app.get('/')
+async def get(request: Request):
+    return templates.TemplateResponse('login.html', {'request': request})
 
 
-class Echo(WebSocketEndpoint):
-    encoding = "text"
+@app.post('/chat/')
+async def post(request: Request, username: str = Form(...)):
+    user_name.append(username)
+    return templates.TemplateResponse('index.html', {'request': request})
 
+
+class Echo:
     async def alter_socket(self, websocket):
         socket_str = str(websocket)[1:-1]
         socket_list = socket_str.split(' ')
@@ -34,7 +33,7 @@ class Echo(WebSocketEndpoint):
     async def on_connect(self, websocket):
         await websocket.accept()
         socket_only = await self.alter_socket(websocket)
-        info[socket_only] = [f'{user_name}', websocket]
+        info[socket_only] = [f'{user_name[-1]}', websocket]
         for wbs in info:
             await info[wbs][1].send_text(f"{info[socket_only][0]}-加入了聊天室")
         print(info)
@@ -44,7 +43,7 @@ class Echo(WebSocketEndpoint):
         for wbs in info:
             await info[wbs][1].send_text(f"{info[socket_only][0]}: {data}")
 
-    async def on_disconnect(self, websocket, close_code):
+    async def on_disconnect(self, websocket):
         socket_only = await self.alter_socket(websocket)
         socket_name = info[socket_only][0]
         for wbs in info:
@@ -57,13 +56,19 @@ class Echo(WebSocketEndpoint):
         pass
 
 
-routes = [
-    Route("/", Login),
-    Route("/chat/", Homepage),
-    WebSocketRoute("/ws", Echo)
-]
+manager = Echo()
 
-app = FastAPI(routes=routes)
+
+@app.websocket('/ws')
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.on_connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.on_receive(websocket, data)
+    except:
+        await manager.on_disconnect(websocket)
+
 
 if __name__ == '__main__':
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
