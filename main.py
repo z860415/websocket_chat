@@ -1,6 +1,4 @@
 from fastapi import FastAPI, Form, WebSocket
-from starlette.endpoints import WebSocketEndpoint, HTTPEndpoint
-from starlette.routing import Route, WebSocketRoute
 from database import info
 from starlette.templating import Jinja2Templates
 from starlette.requests import Request
