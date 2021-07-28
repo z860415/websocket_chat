@@ -18,9 +18,7 @@ class Login(HTTPEndpoint):
 
 class Homepage(HTTPEndpoint):
     async def post(self, request: Request, username: str = Form(...)):
-        print(username)
-        user_name.append(username)
-        print(username, '=='*50)
+        print(username, '*'*50)
         return templates.TemplateResponse('index.html', {'request': request, 'username': username})
 
 
