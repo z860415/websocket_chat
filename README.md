@@ -8,11 +8,11 @@
 
 ## **To start the server:**
 
-* Install dependencies for the server (preferably in a virtualenv):
+* **Install dependencies for the server (preferably in a virtualenv):**
 ```py
 $ pip install -r requirements.txt
 ```
-* Run the server on port 8000:
+* **Run the server on port 8000:**
 ```py
 $ python3 main.py
 ```
