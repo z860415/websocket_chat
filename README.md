@@ -4,7 +4,7 @@
 
 ##### The server is written in Python 3 using  `FastAPI` and the `websockets` library.
 
-##### Web framework for building APIs with Python 3.6+ based on standard Python type hints.
+##### Web framework for building APIs with `Python 3.6+` based on standard Python type hints.
 
 ## **To start the server:**
 
