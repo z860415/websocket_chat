@@ -2,9 +2,9 @@
 
 ##### A Websockets chat server and client. It is written purely as a demo of Websockets functionality and probably servces no useful purpose!
 
-##### The server is written in Python 3 using  `FastAPI`, `asyncio` and the `websockets` library.
+##### The server is written in Python 3 using  `FastAPI` and the `websockets` library.
 
-##### If you are using a Python version below 3.4, you will need to manually install the asyncio library as it is not included.
+##### Web framework for building APIs with Python 3.6+ based on standard Python type hints.
 
 ## **To start the server:**
 
